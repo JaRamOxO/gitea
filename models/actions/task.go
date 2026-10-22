@@ -236,13 +236,13 @@ func GetRunningTaskByToken(ctx context.Context, token string) (*ActionTask, erro
 
 func makeTaskStepDisplayName(step *jobparser.Step, limit int) (name string) {
 	if step.Name != "" {
-		name = string(step.Name) // the step has an explicit name
+		name = step.Name // the step has an explicit name
 	} else {
 		// for unnamed step, its "String()" method tries to get a display name by its "name", "uses",
 		// "run" or "id" (last fallback), we add the "Run " prefix for unnamed steps for better display
 		// for multi-line "run" scripts, only use the first line to match GitHub's behavior
 		// https://github.com/actions/runner/blob/66800900843747f37591b077091dd2c8cf2c1796/src/Runner.Worker/Handlers/ScriptHandler.cs#L45-L58
-		runStr, _, _ := strings.Cut(strings.TrimSpace(string(step.Run)), "\n")
+		runStr, _, _ := strings.Cut(strings.TrimSpace(step.Run), "\n")
 		name = "Run " + util.IfZero(strings.TrimSpace(runStr), step.String())
 	}
 	return util.EllipsisDisplayString(name, limit) // database column has a length limit
@@ -298,6 +298,12 @@ func CreateTaskForRunner(ctx context.Context, runner *ActionRunner) (*ActionTask
 		if err := e.Where(cond).Asc("updated", "id").Limit(pickTaskBatchSize).Find(&jobs); err != nil {
 			return nil, false, err
 		}
+		// A short page means no waiting jobs remain beyond it.
+		isLastPage := len(jobs) < pickTaskBatchSize
+		if !isLastPage {
+			last := jobs[len(jobs)-1] // read before a lost claim bumps Updated
+			cursorUpdated, cursorID = last.Updated, last.ID
+		}
 
 		for _, v := range jobs {
 			if !runner.CanMatchLabels(v.RunsOn) {
@@ -313,12 +319,9 @@ func CreateTaskForRunner(ctx context.Context, runner *ActionRunner) (*ActionTask
 			// Another runner claimed this job concurrently; try the next one.
 		}
 
-		// A short page means no waiting jobs remain beyond it.
-		if len(jobs) < pickTaskBatchSize {
+		if isLastPage {
 			return nil, false, nil
 		}
-		last := jobs[len(jobs)-1]
-		cursorUpdated, cursorID = last.Updated, last.ID
 	}
 }
 

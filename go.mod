@@ -2,7 +2,7 @@ module gitea.dev
 
 go 1.27
 
-toolchain go1.27.1
+toolchain go1.27.2
 
 require (
 	connectrpc.com/connect v1.21.0
@@ -94,11 +94,11 @@ require (
 	github.com/yuin/goldmark v1.8.6
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	gitlab.com/gitlab-org/api/client-go/v3 v3.13.0
-	go.yaml.in/yaml/v4 v4.0.0-rc.6
+	go.yaml.in/yaml/v4 v4.0.0-rc.6.0.20261013184558-04dd63131525
 	golang.org/x/crypto v0.57.0
 	golang.org/x/image v0.46.0
 	golang.org/x/mod v0.41.0
-	golang.org/x/net v0.59.0
+	golang.org/x/net v0.60.0
 	golang.org/x/oauth2 v0.37.0
 	golang.org/x/sync v0.23.0
 	golang.org/x/sys v0.48.0
@@ -109,7 +109,7 @@ require (
 	modernc.org/sqlite v1.59.0
 	mvdan.cc/xurls/v2 v2.6.0
 	xorm.io/builder v0.3.13
-	xorm.io/xorm v1.4.1
+	xorm.io/xorm v1.4.3
 )
 
 require (
