@@ -1,6 +1,6 @@
 # Gitea
 
-This branch includes Fluxer webhooks on Gitea 28.0.0. See the
+This branch includes Fluxer webhooks on Gitea 28.2.0. See the
 [Fluxer Docker release and setup guide](README.fluxer.md).
 
 [![](https://github.com/go-gitea/gitea/actions/workflows/release-nightly.yml/badge.svg?branch=main)](https://github.com/go-gitea/gitea/actions/workflows/release-nightly.yml?query=branch%3Amain "Release Nightly")
