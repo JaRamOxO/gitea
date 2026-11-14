@@ -61,6 +61,8 @@ func TestFluxerPayload(t *testing.T) {
 	issue.Action = api.HookIssueOpened
 	wiki := wikiTestPayload()
 	wiki.Action = api.HookWikiCreated
+	release := pullReleaseTestPayload()
+	release.Release.Attachments = []*api.Attachment{{}, {}}
 	sender := &api.User{UserName: "user1", AvatarURL: "https://gitea.example/avatar.png"}
 	cases := []struct {
 		event   webhook_module.HookEventType
@@ -78,7 +80,7 @@ func TestFluxerPayload(t *testing.T) {
 		{webhook_module.HookEventPullRequestReviewRejected, review},
 		{webhook_module.HookEventPullRequestReviewComment, review},
 		{webhook_module.HookEventRepository, deleted},
-		{webhook_module.HookEventRelease, pullReleaseTestPayload()},
+		{webhook_module.HookEventRelease, release},
 		{webhook_module.HookEventWiki, wiki},
 		{webhook_module.HookEventPackage, packageTestPayload()},
 		{webhook_module.HookEventStatus, &api.CommitStatusPayload{Sender: sender, SHA: strings.Repeat("a", 40), Context: "ci", Description: "Passed", State: "success"}},
@@ -102,6 +104,9 @@ func TestFluxerPayload(t *testing.T) {
 			assert.Equal(t, source.Embeds[0].Description, payload.Embeds[0].Description)
 			assert.Equal(t, source.Embeds[0].Color, payload.Embeds[0].Color)
 			assert.Equal(t, source.Embeds[0].Author.Name, payload.Embeds[0].Author.Name)
+			if tc.event == webhook_module.HookEventRelease {
+				assert.Equal(t, "[test/repo] Release created: v1.0 (assets: 2)", payload.Embeds[0].Title)
+			}
 			assert.NotContains(t, string(body), `"footer"`)
 			assert.NotContains(t, string(body), `"fields"`)
 			if tc.event == webhook_module.HookEventRepository || tc.event == webhook_module.HookEventStatus {
