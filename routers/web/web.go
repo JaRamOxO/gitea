@@ -560,7 +560,7 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 
 	m.Group("/issues", func() {
 		m.Get("", user.Issues)
-		m.Get("/search", repo.SearchIssues)
+		m.Get("/search", repo.SearchGlobalIssues)
 	}, reqSignIn)
 
 	m.Get("/pulls", reqSignIn, user.Pulls)
@@ -1392,7 +1392,7 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 			})
 
 			m.Post("/attachments", repo.UploadIssueAttachment)
-			m.Post("/attachments/remove", repo.DeleteAttachment)
+			m.Post("/attachments/remove", repo.DeletePendingAttachment)
 
 			m.Post("/labels", reqRepoIssuesOrPullsWriter, repo.UpdateIssueLabel)
 			m.Post("/milestone", reqRepoIssuesOrPullsWriter, repo.UpdateIssueMilestone)
@@ -1520,7 +1520,7 @@ func registerWebRoutes(m *web.Router, webAuth *AuthMiddleware) {
 			m.Post("/generate-notes", web.Bind[*forms.GenerateReleaseNotesForm](), repo.GenerateReleaseNotes)
 			m.Post("/delete", repo.DeleteRelease)
 			m.Post("/attachments", repo.UploadReleaseAttachment)
-			m.Post("/attachments/remove", repo.DeleteAttachment)
+			m.Post("/attachments/remove", repo.DeletePendingAttachment)
 		}, reqSignIn, context.RepoMustNotBeArchived(), reqRepoReleaseWriter)
 	}, optSignIn, context.RepoAssignment, repo.MustBeNotEmpty, reqRepoReleaseReader)
 	// end "/{username}/{reponame}": repo releases
